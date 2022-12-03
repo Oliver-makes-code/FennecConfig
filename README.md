@@ -3,7 +3,7 @@
 A config designed around readability
 
 ```fennec
-# Basic k/v pairings
+# Basic key/value pairings
 key1 = "value"
 key2 = 15
 
@@ -13,40 +13,53 @@ key2 = 15
 key1: string = "value"
 key2: number = 15
 
-# Nested k/v pairs
+# Nested key/value objects
 someNest { # Note, no equal sign is needed
     key1: string = "owo"
     key2: string = "nya"
+    anotherNest {
+        key = "hi!"
+    }
 }
 
 # Array of values
 someArray [
     "owo" "uwu"
+    [
+        "hewwo!"
+    ]
 ]
 
-# Multiline strings
-someString: string = """
+# Arrays can nest key/value objects
+someOtherArray [
+    {
+        key = "I use nyarch, BTW!"
+    }
+]
+
+# Multiline strings are supported
+someString: string = "
     awoo nya owo uwu owo uwu uwu nya awoo.
     nya nya nya owo uwu owo owo owo.
-"""
+"
 
 # Put a - before a multiline string to trim indents
-someOtherString: string = -"""
+someOtherString: string = -"
     owo
     uwu
-"""
+"
 
 # Primitive types
 strings [
     "owo"
-    """
+    "
         owo
-    """
-    -"""
+    "
+    -"
         uwu
-    """
+    "
 ]
-number [
+numbers [
     5915587277 # Int
     6.2831853071 # Float
     0x45 # Hex literal
@@ -54,9 +67,16 @@ number [
     0o105 # Octal literal
     0b1000101 # Binary literal
 ]
-boolean [
+booleans [
     true # true/false
     False # True/False
     1b # 1b/0b
+]
+nulls [
+    null
+    nill
+    nul
+    nil
+    void
 ]
 ```
