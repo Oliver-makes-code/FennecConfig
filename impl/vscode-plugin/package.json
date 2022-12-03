@@ -1,0 +1,25 @@
+{
+  "name": "fennecconfig",
+  "displayName": "Fennec Config support",
+  "description": "A config designed around readability",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.73.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "fennec",
+      "aliases": ["fennec config", "fennec"],
+      "extensions": [".fennec", "fennec"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "fennec",
+      "scopeName": "source.fennec",
+      "path": "./syntaxes/fennec.tmLanguage.json"
+    }]
+  }
+}
