@@ -13,6 +13,9 @@ key2 = 15
 key1: string = "value"
 key2: number = 15
 
+# Keys can also be quoted, to include more than just A-Z0-9$
+"Hello, World!" = 15
+
 # Nested key/value objects
 someNest { # Note, no equal sign is needed
     key1: string = "owo"
@@ -38,26 +41,26 @@ someOtherArray [
 ]
 
 # Multiline strings are supported
-someString: string = "
+someString: string = """
     awoo nya owo uwu owo uwu uwu nya awoo.
     nya nya nya owo uwu owo owo owo.
-"
+"""
 
 # Put a - before a multiline string to trim indents
-someOtherString: string = -"
+someOtherString: string = -"""
     owo
     uwu
-"
+"""
 
 # Primitive types
 strings [
     "owo"
-    "
+    """
         owo
-    "
-    -"
+    """
+    -"""
         uwu
-    "
+    """
 ]
 numbers [
     5915587277 # Int
