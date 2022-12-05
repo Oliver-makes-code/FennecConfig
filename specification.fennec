@@ -80,3 +80,14 @@ nulls [
     nil
     void
 ]
+
+# Fennec also supports files that contain a value at root, such as a string or an array
+# This helps Fennec go to and from JSON
+# An example of such:
+# ```fennec
+# [
+#     1 2 "owo" "nya" 
+#     null
+#     false 93479834
+# ]
+# ```
