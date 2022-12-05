@@ -25,7 +25,8 @@ someNest { # Note, no equal sign
 }
 # Key/value objects can also have type hints
 someObject: owo {
-    
+    key1 = "h"
+    key2 = "a"
 }
 
 # Array of values
