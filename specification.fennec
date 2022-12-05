@@ -92,4 +92,4 @@ nulls [
 # ]
 # ```
 # This can also be applied with a key/value object
-# Making JSON's standard of having braces around the root object optional.
+# Making JSON's standard of having braces around the root node optional.
