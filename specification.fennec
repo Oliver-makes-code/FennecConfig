@@ -60,7 +60,6 @@ someOtherString: string = -"""
     owo
     uwu
 """
-
 # Primitive types
 strings [
     "owo"
