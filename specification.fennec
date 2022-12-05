@@ -5,14 +5,18 @@ key2 = 15
 # Type hints to guide on what values are expected
 # These are not checked when parsing, they only serve to guide people reading the config
 # As they're not checked, they can contain any text, as long as it's not a : or =
-key1: string = "value"
-key2: number = 15
+key3: string = "value"
+key4: number = 15
 
 # Keys can also be quoted, to include more than just A-Z0-9$
 "Hello, World!" = 15
 
+# Mutliple keys can also be on the same line, if space separated
+# This is not recommended, though, as it impairs readability
+key5: string = "owo" key6: string = "uwu"
+
 # Nested key/value objects
-someNest { # Note, no equal sign is needed
+someNest { # Note, no equal sign
     key1: string = "owo"
     key2: string = "nya"
     anotherNest {
@@ -22,7 +26,7 @@ someNest { # Note, no equal sign is needed
 # Key/value objects cannot have type hints, but the contents of the object can
 
 # Array of values
-someArray [
+someArray [ # Again, no equal sign
     "owo" "uwu"
     [
         "hewwo!"
