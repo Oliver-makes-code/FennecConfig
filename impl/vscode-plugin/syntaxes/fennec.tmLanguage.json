@@ -95,7 +95,7 @@
 			"match": "#.*$"
 		},
 		"types": {
-			"match": ":([^=\\[]+)",
+			"match": ":([^=\\[{]+)",
 			"captures": {
 				"0": {
 					"name": "keyword.other.fennec"

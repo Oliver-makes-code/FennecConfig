@@ -4,7 +4,7 @@ key2 = 15
 
 # Type hints to guide on what values are expected
 # These are not checked when parsing, they only serve to guide people reading the config
-# As they're not checked, they can contain any text, as long as it's not a : or =
+# As they're not checked, they can contain any text, as long as it's not a :, [, {, or =
 key3: string = "value"
 key4: number = 15
 
@@ -23,7 +23,10 @@ someNest { # Note, no equal sign
         key = "hi!"
     }
 }
-# Key/value objects cannot have type hints, but the contents of the object can
+# Key/value objects can also have type hints
+someObject: owo {
+    
+}
 
 # Array of values
 someArray [ # Again, no equal sign
