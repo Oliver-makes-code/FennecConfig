@@ -19,6 +19,7 @@ someNest { # Note, no equal sign is needed
         key = "hi!"
     }
 }
+# Key/value objects cannot have type hints, but the contents of the object can
 
 # Array of values
 someArray [
