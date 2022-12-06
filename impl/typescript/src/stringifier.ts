@@ -29,7 +29,7 @@ export default function stringify(values: any, showType = true, indent = 4, leve
         output += " ".repeat(indent*level)
         if (key.includes("\n"))
             output += `"""${key}"""`
-        else if (!common.ACCEPTABLE_ID.test(key))
+        else if (!key.match(common.ACCEPTABLE_ID))
             output += `"${key}"`
         else
             output += key
