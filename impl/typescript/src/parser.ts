@@ -7,7 +7,8 @@ const TokenType = {
     number: "number",
     boolean: "boolean",
     null: "null",
-    symbol: "symbol"
+    symbol: "symbol",
+    type: "type"
 } as const
 
 type TokenType = typeof TokenType[keyof typeof TokenType]
@@ -34,6 +35,9 @@ function* tokenize(text: string): Generator<Token, void, unknown> {
         const matchNumber = substr.match(common.NUMBER)
         if (char.match(common.WHITESPASE)) {
             continue
+        } else if (char == ":") {
+            for (; i < text.length; i++) if ("=[{".includes(text[i])) break
+            i--
         } else if (char == "#") {
             for (i++; i < text.length; i++) {
                 if (text[i] == "\n") break
@@ -101,7 +105,6 @@ function* tokenize(text: string): Generator<Token, void, unknown> {
                     break
                 }
             }
-            if (text[i] == ":") for (; i < text.length; i++) if ("=[{".includes(text[i])) break
             i--
             yield {
                 value: id,
@@ -211,10 +214,16 @@ function parseTree(text: string, tokens: Generator<Token, void, unknown>): any {
             }
         }
         if (token.type != TokenType.identifier && token.type != TokenType.string) throw new common.ParserError("Unexpected "+token.type+" found when required identifer", text, token.start)
-        const next = tokens.next().value
+        let next = tokens.next().value
         if (!next && isFirst && token.type == TokenType.string) return token.value
         else if (!next) throw new common.ParserError("Unexpected EOF", text, token.end)
+        if (next.type == TokenType.type) {
+            const prev = next
+            next = tokens.next().value
+            if (!next) throw new common.ParserError("Unexpected EOF", text, prev.end)
+        }
         if (next.type == TokenType.symbol && (next.value == "]" || next.value == "}")) throw new common.ParserError("Found unexpected symbol in object", text, next.start)
+        
         if (next.type != TokenType.symbol) throw new common.ParserError("Expected symbol in object", text, next.start)
         if (next.value == "=") {
             const val = tokens.next().value
@@ -241,13 +250,15 @@ function parseArray(text: string, token: Token, tokens: Generator<Token, void, u
         lastToken = token
         if (token.type == TokenType.identifier){
             throw new common.ParserError("Found identifier in array", text, token.start)
+        } else if (token.type == TokenType.type) {
+            throw new common.ParserError("Found type hint in array", text, token.start)
         } else if (token.type == TokenType.symbol && token.value == "]") {
             return out
         } else if (token.type == TokenType.symbol && token.value == "[") {
             out.push(parseArray(text, token, tokens))
         } else if (token.type == TokenType.symbol && token.value == "{") {
             out.push(parseObject(text, token, tokens))
-        } else {
+        }else {
             out.push(token.value)
         }
         last = tokens.next()
@@ -266,9 +277,15 @@ function parseObject(text: string, token: Token, tokens: Generator<Token, void, 
             return out
         }
         if (token.type != TokenType.identifier && token.type != TokenType.string) throw new common.ParserError("Unexpected "+token.type+" found when required identifer", text, token.start)
-        const next = tokens.next().value
+        let next = tokens.next().value
         if (!next) throw new common.ParserError("Unexpected EOF", text, token.end)
         lastToken = next
+        if (next.type == TokenType.type) {
+            const prev = next
+            next = tokens.next().value
+            if (!next) throw new common.ParserError("Unexpected EOF", text, prev.end)
+            lastToken = next
+        }
         if (next.type == TokenType.symbol && (next.value == "]" || next.value == "}")) throw new common.ParserError("Found unexpected symbol in object", text, next.start)
         if (next.type != TokenType.symbol) throw new common.ParserError("Expected symbol in object", text, next.start)
         if (next.value == "=") {
