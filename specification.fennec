@@ -8,7 +8,7 @@ key2 = 15
 key3: string = "value"
 key4: number = 15
 
-# Keys can also be quoted, to include more than just A-Z0-9$
+# Keys can also be quoted, to include more than just /A-Z0-9$\-_/i
 "Hello, World!" = 15
 
 # Mutliple keys can also be on the same line, if space separated

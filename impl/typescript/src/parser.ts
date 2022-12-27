@@ -178,6 +178,7 @@ function* tokenize(text: string): Generator<Token, void, unknown> {
                 str += text[i]
             }
             if (!closed) throw new common.ParserError("String not closed.", text, idx)
+            if (str.includes("\n")) throw new common.ParserError("Single quoted string cannot contain newline.", text, idx)
             yield {
                 value: str,
                 type: TokenType.string,
