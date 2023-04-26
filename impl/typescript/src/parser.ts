@@ -3,6 +3,7 @@ import * as common from "./common.ts"
 
 const TokenType = {
     identifier: "identifier",
+    flag: "flag",
     string: "string",
     number: "number",
     boolean: "boolean",
@@ -141,6 +142,23 @@ function* tokenize(text: string): Generator<Token, void, unknown> {
                 start: idx,
                 end: i
             }
+        } else if (char == "-") {
+            let id = ''
+            for (i++; i < text.length; i++) {
+                const next = text[i]
+                if (next.match(common.ID_CONT)) {
+                    id += next
+                } else {
+                    break
+                }
+            }
+            i--
+            yield {
+                value: id,
+                type: TokenType.flag,
+                start: idx,
+                end: i
+            }
         } else if (substr.startsWith('"""')) {
             let str = ""
             let closed = false
@@ -214,6 +232,11 @@ function parseTree(text: string, tokens: Generator<Token, void, unknown>): any {
                 return object
             }
         }
+        if (token.type == TokenType.flag) {
+            out[token.value as string] = true
+            isFirst = false
+            continue
+        }
         if (token.type != TokenType.identifier && token.type != TokenType.string) throw new common.ParserError("Unexpected "+token.type+" found when required identifer", text, token.start)
         let next = tokens.next().value
         if (!next && isFirst && token.type == TokenType.string) return token.value
@@ -251,6 +274,8 @@ function parseArray(text: string, token: Token, tokens: Generator<Token, void, u
         lastToken = token
         if (token.type == TokenType.identifier){
             throw new common.ParserError("Found identifier in array", text, token.start)
+        } else if (token.type == TokenType.flag) {
+            throw new common.ParserError("Found identifier in array", text, token.start)
         } else if (token.type == TokenType.type) {
             throw new common.ParserError("Found type hint in array", text, token.start)
         } else if (token.type == TokenType.symbol && token.value == "]") {
@@ -276,6 +301,10 @@ function parseObject(text: string, token: Token, tokens: Generator<Token, void, 
         lastToken = token
         if (token.type == TokenType.symbol && token.value == "}") {
             return out
+        }
+        if (token.type == TokenType.flag) {
+            out[token.value as string] = true
+            continue
         }
         if (token.type != TokenType.identifier && token.type != TokenType.string) throw new common.ParserError("Unexpected "+token.type+" found when required identifer", text, token.start)
         let next = tokens.next().value

@@ -37,6 +37,9 @@
 		},
 		{
 			"include": "#members"
+		},
+		{
+			"include": "#flags"
 		}
 	],
 	"repository": {
@@ -112,6 +115,10 @@
 		"members": {
 			"name": "variable.name.fennec",
 			"match": "[a-zA-Z][a-zA-Z0-9$]*"
+		},
+		"flags": {
+			"name": "variable.name.fennec",
+			"match": "-[a-zA-Z0-9$]*"
 		}
 	},
 	"scopeName": "source.fennec"

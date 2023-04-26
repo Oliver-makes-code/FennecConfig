@@ -60,6 +60,10 @@ someOtherString: string = -"""
     owo
     uwu
 """
+
+# You can also have flags, which act as a boolean, if they're present, they're set to true
+-someFlag
+
 # Primitive types
 strings [
     "owo"
