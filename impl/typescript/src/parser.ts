@@ -88,7 +88,7 @@ function* tokenize(text: string): Generator<Token, void, unknown> {
                 end: i
             }
         } else if (matchNumber) {
-            const number = parseInt(matchNumber[1])
+            const number = parseFloat(matchNumber[1])
             i += matchNumber[0].length - 1
             yield {
                 value: number,
