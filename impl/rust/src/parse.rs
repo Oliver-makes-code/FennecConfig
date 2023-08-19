@@ -108,9 +108,9 @@ impl FennecType {
         }
         None
     }
-    pub fn get_key(&self, key: String) -> Option<&FennecType> {
+    pub fn get_key(&self, key: &str) -> Option<&FennecType> {
         if let Self::Object(var) = self {
-            return var.get(&key);
+            return var.get(key);
         }
         None
     }
@@ -256,7 +256,7 @@ impl Parser {
                 }
 
                 Token::Flag(name, _) => {
-                    out.insert(name, FennecType::Bool(true))
+                    out.insert(name.to_string(), FennecType::Bool(true));
                 }
 
                 Token::Identifier(name, _) | Token::String(name, _) => {

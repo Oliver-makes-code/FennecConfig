@@ -1,2 +1,13 @@
+.vscode/
+
 target/
 Cargo.lock
+
+*.o
+*.a
+*.o
+*.dll
+*.lib
+*.so
+*.out
+*.d

@@ -1,4 +1,5 @@
-#![feature(decl_macro, let_chains)]
+#![feature(decl_macro, let_chains, ascii_char)]
+pub mod extern_c;
 pub mod token;
 pub mod parse;
 
