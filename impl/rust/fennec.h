@@ -72,7 +72,7 @@ FennecConfig_FennecValue_Object *FennecConfig_FennecValue_GetObject(FennecConfig
 
 bool FennecConfig_FennecValue_Object_HasKey(FennecConfig_FennecValue_Object *obj, char *key) {
     for (int i = 0; i < obj->len; i++) {
-        if (strcmp(key, obj->keys[i])) {
+        if (strcmp(key, obj->keys[i]) == 0) {
             return true;
         }
     }
@@ -81,7 +81,7 @@ bool FennecConfig_FennecValue_Object_HasKey(FennecConfig_FennecValue_Object *obj
 
 FennecConfig_FennecValue *FennecConfig_FennecValue_Object_GetKey(FennecConfig_FennecValue_Object *obj, char *key) {
     for (int i = 0; i < obj->len; i++) {
-        if (strcmp(key, obj->keys[i])) {
+        if (strcmp(key, obj->keys[i]) == 0) {
             return &obj->values[i];
         }
     }
