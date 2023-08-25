@@ -25,7 +25,7 @@ pub enum Token {
     Bool(bool, Position),
     Null(Position),
     Err(usize),
-    Eof
+    Eof,
 }
 
 #[derive(Clone)]
@@ -34,24 +34,25 @@ pub struct Tokenizer {
     pub index: usize,
 }
 
-const SYMBOLS: Lazy<Vec<char>> = lazy!{ "={}[]".chars().collect() };
-const NULL: Lazy<Regex> = lazy!{ Regex::new(r"^(null|nil|void)").unwrap() };
-const NOT_NULL: Lazy<Regex> = lazy!{ Regex::new(r"^(null|nil|void)[a-z0-9$_\-]").unwrap() };
-const BOOL: Lazy<Regex> = lazy!{ Regex::new(r"^([Tt]rue|[Ff]alse|[01]b)").unwrap() };
-const NOT_BOOL: Lazy<Regex> = lazy!{ Regex::new(r"^([Tt]rue|[Ff]alse|[01]b)[a-z0-9$_\-]").unwrap() };
-const HEX_LITERAL: Lazy<Regex> = lazy!{ Regex::new(r"^([01])x([0-9a-fA-F]+)").unwrap() };
-const OCT_LITERAL: Lazy<Regex> = lazy!{ Regex::new(r"^([01])o([0-7]+)").unwrap() };
-const BIN_LITERAL: Lazy<Regex> = lazy!{ Regex::new(r"^([01])b([01]+)").unwrap() };
-const FLOATING: Lazy<Regex> = lazy!{ Regex::new(r"^\-?[0-9]+\.[0-9]+").unwrap() };
-const INTEGER: Lazy<Regex> = lazy!{ Regex::new(r"^\-?[0-9]+").unwrap() };
-const IDENTIFIER: Lazy<Regex> = lazy!{ Regex::new(r"^([a-zA-Z$_][a-zA-Z$_\-0-9]+)").unwrap() };
-const FLAG: Lazy<Regex> = lazy!{ Regex::new(r"^\-([a-zA-Z$_\-0-9]+)").unwrap() };
+const SYMBOLS: Lazy<Vec<char>> = lazy! { "={}[]".chars().collect() };
+const NULL: Lazy<Regex> = lazy! { Regex::new(r"^(null|nil|void)").unwrap() };
+const NOT_NULL: Lazy<Regex> = lazy! { Regex::new(r"^(null|nil|void)[a-z0-9$_\-]").unwrap() };
+const BOOL: Lazy<Regex> = lazy! { Regex::new(r"^([Tt]rue|[Ff]alse|[01]b)").unwrap() };
+const NOT_BOOL: Lazy<Regex> =
+    lazy! { Regex::new(r"^([Tt]rue|[Ff]alse|[01]b)[a-z0-9$_\-]").unwrap() };
+const HEX_LITERAL: Lazy<Regex> = lazy! { Regex::new(r"^([01])x([0-9a-fA-F]+)").unwrap() };
+const OCT_LITERAL: Lazy<Regex> = lazy! { Regex::new(r"^([01])o([0-7]+)").unwrap() };
+const BIN_LITERAL: Lazy<Regex> = lazy! { Regex::new(r"^([01])b([01]+)").unwrap() };
+const FLOATING: Lazy<Regex> = lazy! { Regex::new(r"^\-?[0-9]+\.[0-9]+").unwrap() };
+const INTEGER: Lazy<Regex> = lazy! { Regex::new(r"^\-?[0-9]+").unwrap() };
+const IDENTIFIER: Lazy<Regex> = lazy! { Regex::new(r"^([a-zA-Z$_][a-zA-Z$_\-0-9]+)").unwrap() };
+const FLAG: Lazy<Regex> = lazy! { Regex::new(r"^\-([a-zA-Z$_\-0-9]+)").unwrap() };
 
 impl Tokenizer {
     pub fn new(doc: &str) -> Self {
         Self {
             chars: doc.chars().collect(),
-            index: 0
+            index: 0,
         }
     }
 
@@ -89,7 +90,7 @@ impl Tokenizer {
             'b' => return 8 as char,
             'f' => return 12 as char,
             'r' => return '\r',
-            _ => return escape
+            _ => return escape,
         }
     }
 
@@ -135,7 +136,7 @@ impl Tokenizer {
 
     pub fn next_token(&mut self) -> Token {
         if self.is_end() {
-            return Token::Eof
+            return Token::Eof;
         }
 
         let mut char = self.get_char();
@@ -154,12 +155,18 @@ impl Tokenizer {
 
         if char == '#' {
             self.index += 1;
-            return Token::Comment(self.seek_to(vec!['\n']).trim().to_string(), Position(start_idx, self.index));
+            return Token::Comment(
+                self.seek_to(vec!['\n']).trim().to_string(),
+                Position(start_idx, self.index),
+            );
         }
 
         if char == ':' {
             self.index += 1;
-            return Token::Type(self.seek_to(SYMBOLS.to_vec()).trim().to_string(), Position(start_idx, self.index));
+            return Token::Type(
+                self.seek_to(SYMBOLS.to_vec()).trim().to_string(),
+                Position(start_idx, self.index),
+            );
         }
 
         let str = self.to_string();
@@ -173,12 +180,15 @@ impl Tokenizer {
                 str.push_str(line.trim_start());
                 str.push('\n');
             }
-            return Token::String(str.trim().to_string(), Position(start_idx, self.index))
+            return Token::String(str.trim().to_string(), Position(start_idx, self.index));
         }
 
         if str.starts_with("\"\"\"") {
             self.index += 3;
-            return Token::String(self.to_triple_quote().trim().to_string(), Position(start_idx, self.index))
+            return Token::String(
+                self.to_triple_quote().trim().to_string(),
+                Position(start_idx, self.index),
+            );
         }
 
         if char == '"' {
@@ -209,46 +219,55 @@ impl Tokenizer {
         if let Some(capture) = HEX_LITERAL.captures(&str) {
             let str = &capture[0];
             self.index += str.len();
-            let sign = if &capture[1] == "1" {-1} else {1};
-            return Token::Int(sign * i64::from_str_radix(&capture[2], 16).unwrap(), Position(start_idx, self.index))
+            let sign = if &capture[1] == "1" { -1 } else { 1 };
+            return Token::Int(
+                sign * i64::from_str_radix(&capture[2], 16).unwrap(),
+                Position(start_idx, self.index),
+            );
         }
 
         if let Some(capture) = OCT_LITERAL.captures(&str) {
             let str = &capture[0];
             self.index += str.len();
-            let sign = if &capture[1] == "1" {-1} else {1};
-            return Token::Int(sign * i64::from_str_radix(&capture[2], 8).unwrap(), Position(start_idx, self.index))
+            let sign = if &capture[1] == "1" { -1 } else { 1 };
+            return Token::Int(
+                sign * i64::from_str_radix(&capture[2], 8).unwrap(),
+                Position(start_idx, self.index),
+            );
         }
 
         if let Some(capture) = BIN_LITERAL.captures(&str) {
             let str = &capture[0];
             self.index += str.len();
-            let sign = if &capture[1] == "1" {-1} else {1};
-            return Token::Int(sign * i64::from_str_radix(&capture[2], 2).unwrap(), Position(start_idx, self.index))
+            let sign = if &capture[1] == "1" { -1 } else { 1 };
+            return Token::Int(
+                sign * i64::from_str_radix(&capture[2], 2).unwrap(),
+                Position(start_idx, self.index),
+            );
         }
 
         if let Some(capture) = FLOATING.captures(&str) {
             let str = &capture[0];
             self.index += str.len();
-            return Token::Float(str.parse::<f64>().unwrap(), Position(start_idx, self.index))
+            return Token::Float(str.parse::<f64>().unwrap(), Position(start_idx, self.index));
         }
 
         if let Some(capture) = INTEGER.captures(&str) {
             let str = &capture[0];
             self.index += str.len();
-            return Token::Int(str.parse::<i64>().unwrap(), Position(start_idx, self.index))
+            return Token::Int(str.parse::<i64>().unwrap(), Position(start_idx, self.index));
         }
 
         if let Some(capture) = FLAG.captures(&str) {
             let str = &capture[0];
-            self.index += str.len()+1;
-            return Token::Flag(str.to_string(), Position(start_idx, self.index))
+            self.index += str.len() + 1;
+            return Token::Flag(str.to_string(), Position(start_idx, self.index));
         }
 
         if let Some(capture) = IDENTIFIER.captures(&str) {
             let str = &capture[0];
             self.index += str.len();
-            return Token::Identifier(str.to_string(), Position(start_idx, self.index))
+            return Token::Identifier(str.to_string(), Position(start_idx, self.index));
         }
 
         Token::Err(start_idx)

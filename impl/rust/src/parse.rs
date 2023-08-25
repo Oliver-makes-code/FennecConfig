@@ -3,7 +3,10 @@ use std::collections::HashMap;
 use once_cell::sync::Lazy;
 use regex::Regex;
 
-use crate::{token::{Token, Tokenizer}, lazy};
+use crate::{
+    lazy,
+    token::{Token, Tokenizer},
+};
 
 #[derive(Debug)]
 pub enum FennecType {
@@ -13,7 +16,7 @@ pub enum FennecType {
     Float(f64),
     Int(i64),
     Bool(bool),
-    Null
+    Null,
 }
 
 impl ToString for FennecType {
@@ -23,28 +26,28 @@ impl ToString for FennecType {
 }
 
 const INDENT: usize = 4;
-const IDENTIFIER: Lazy<Regex> = lazy!{ Regex::new(r"^([a-zA-Z$_][a-zA-Z$_\-0-9]+)$").unwrap() };
+const IDENTIFIER: Lazy<Regex> = lazy! { Regex::new(r"^([a-zA-Z$_][a-zA-Z$_\-0-9]+)$").unwrap() };
 
 impl FennecType {
     fn replace_escapes(str: &str) -> String {
-        str
-        .replace('\n', "\\n")
-        .replace('\t', "\\t")
-        .replace('\r', "\\r")
-        .replace(8 as char, "\\b")
-        .replace(12 as char, "\\f")
+        str.replace('\n', "\\n")
+            .replace('\t', "\\t")
+            .replace('\r', "\\r")
+            .replace(8 as char, "\\b")
+            .replace(12 as char, "\\f")
     }
 
     fn to_string_internal(&self, indent: usize, first: bool) -> String {
         match self {
-            Self::String(str) => return format_args!("\"{}\"", &FennecType::replace_escapes(str)).to_string(),
+            Self::String(str) => {
+                return format_args!("\"{}\"", &FennecType::replace_escapes(str)).to_string()
+            }
             Self::Float(num) => return num.to_string(),
             Self::Int(num) => return num.to_string(),
             Self::Bool(bool) => return bool.to_string(),
             Self::Null => return "null".to_string(),
 
             Self::Object(obj) => {
-
                 let mut out = "".to_string();
 
                 if !first {
@@ -53,9 +56,9 @@ impl FennecType {
                 }
 
                 let idt = if first { indent } else { indent + 1 };
-                
+
                 for key in obj.keys() {
-                    out.push_str(&" ".repeat(idt*INDENT));
+                    out.push_str(&" ".repeat(idt * INDENT));
                     if IDENTIFIER.is_match(key) {
                         out.push_str(key);
                     } else {
@@ -78,24 +81,24 @@ impl FennecType {
                 }
 
                 if !first {
-                    out.push_str(&" ".repeat(indent*INDENT));
+                    out.push_str(&" ".repeat(indent * INDENT));
                     out.push('}');
                 }
 
                 return out;
-            }, 
+            }
             Self::Array(arr) => {
                 let mut out = "[\n".to_string();
 
                 let idt = indent + 1;
 
                 for val in arr {
-                    out.push_str(&" ".repeat(idt*INDENT));
+                    out.push_str(&" ".repeat(idt * INDENT));
                     out.push_str(&val.to_string_internal(idt, false));
                     out.push('\n');
                 }
 
-                out.push_str(&" ".repeat(indent*INDENT));
+                out.push_str(&" ".repeat(indent * INDENT));
                 out.push(']');
                 return out;
             }
@@ -160,18 +163,16 @@ impl FennecType {
 
 #[derive(Debug)]
 pub enum ParseError {
-    UnexpectedToken(Token)
+    UnexpectedToken(Token),
 }
 
 pub struct Parser {
-    tokenizer: Tokenizer
+    tokenizer: Tokenizer,
 }
 
 impl Parser {
     pub fn new(tokenizer: Tokenizer) -> Self {
-        Self {
-            tokenizer
-        }
+        Self { tokenizer }
     }
 
     pub fn parse_root(&mut self) -> Result<FennecType, ParseError> {
@@ -184,42 +185,37 @@ impl Parser {
 
             Token::String(val, pos) => {
                 if let Token::Eof = self.tokenizer.next() {
-                    return Ok(FennecType::String(val.to_string()))
+                    return Ok(FennecType::String(val.to_string()));
                 }
                 self.tokenizer.index = pos.0;
                 return self.parse_object(true);
             }
 
-            Token::Symbol(_, _) |
-            Token::Float(_, _) |
-            Token::Bool(_, _) |
-            Token::Int(_, _) |
-            Token::Null(_) 
-                => return self.parse_value(token),
+            Token::Symbol(_, _)
+            | Token::Float(_, _)
+            | Token::Bool(_, _)
+            | Token::Int(_, _)
+            | Token::Null(_) => return self.parse_value(token),
 
-            _ => return Err(ParseError::UnexpectedToken(token))
+            _ => return Err(ParseError::UnexpectedToken(token)),
         };
-        
     }
 
     fn parse_value(&mut self, token: Token) -> Result<FennecType, ParseError> {
         match &token {
-            Token::String(_, _) |
-            Token::Float(_, _) |
-            Token::Bool(_, _) |
-            Token::Int(_, _) |
-            Token::Null(_) 
-                => return self.parse_primitive(token),
+            Token::String(_, _)
+            | Token::Float(_, _)
+            | Token::Bool(_, _)
+            | Token::Int(_, _)
+            | Token::Null(_) => return self.parse_primitive(token),
 
             Token::Symbol(char, _) => match char {
                 '{' => return self.parse_object(false),
                 '[' => return self.parse_array(),
-                _ => return Err(ParseError::UnexpectedToken(token))
-            }
+                _ => return Err(ParseError::UnexpectedToken(token)),
+            },
 
-            _ => {
-                return Err(ParseError::UnexpectedToken(token))
-            }
+            _ => return Err(ParseError::UnexpectedToken(token)),
         };
     }
 
@@ -231,9 +227,7 @@ impl Parser {
             Token::Bool(val, _) => return Ok(FennecType::Bool(*val)),
             Token::Null(_) => return Ok(FennecType::Null),
 
-            _ => {
-                return Err(ParseError::UnexpectedToken(token))
-            }
+            _ => return Err(ParseError::UnexpectedToken(token)),
         };
     }
 
@@ -243,16 +237,20 @@ impl Parser {
         loop {
             let token = self.tokenizer.next();
             match &token {
-                Token::Eof => if expect_eof {
-                    return Ok(FennecType::Object(out))
-                } else {
-                    return Err(ParseError::UnexpectedToken(token))
+                Token::Eof => {
+                    if expect_eof {
+                        return Ok(FennecType::Object(out));
+                    } else {
+                        return Err(ParseError::UnexpectedToken(token));
+                    }
                 }
 
-                Token::Symbol(char, _) => if *char == '}' && !expect_eof {
-                    return Ok(FennecType::Object(out))
-                } else {
-                    return Err(ParseError::UnexpectedToken(token))
+                Token::Symbol(char, _) => {
+                    if *char == '}' && !expect_eof {
+                        return Ok(FennecType::Object(out));
+                    } else {
+                        return Err(ParseError::UnexpectedToken(token));
+                    }
                 }
 
                 Token::Flag(name, _) => {
@@ -270,30 +268,39 @@ impl Parser {
                                 if primitive.is_err() {
                                     return primitive;
                                 }
-                                out.insert(name.to_string(), primitive.expect("We just checked! This shouldn't be Err."));
+                                out.insert(
+                                    name.to_string(),
+                                    primitive.expect("We just checked! This shouldn't be Err."),
+                                );
                             }
                             '[' => {
                                 let arr = self.parse_array();
                                 if arr.is_err() {
                                     return arr;
                                 }
-                                out.insert(name.to_string(), arr.expect("We just checked! This shouldn't be Err."));
+                                out.insert(
+                                    name.to_string(),
+                                    arr.expect("We just checked! This shouldn't be Err."),
+                                );
                             }
                             '{' => {
                                 let obj = self.parse_object(false);
                                 if obj.is_err() {
                                     return obj;
                                 }
-                                out.insert(name.to_string(), obj.expect("We just checked! This shouldn't be Err."));
+                                out.insert(
+                                    name.to_string(),
+                                    obj.expect("We just checked! This shouldn't be Err."),
+                                );
                             }
-                            _ => return Err(ParseError::UnexpectedToken(next))
+                            _ => return Err(ParseError::UnexpectedToken(next)),
                         }
                     } else {
                         return Err(ParseError::UnexpectedToken(next));
                     }
                 }
 
-                _ => return Err(ParseError::UnexpectedToken(token))
+                _ => return Err(ParseError::UnexpectedToken(token)),
             }
         }
     }
