@@ -48,6 +48,7 @@ FennecConfig_FennecValue *FennecConfig_ParseString(char *str);
 
 FennecConfig_FennecValue *FennecConfig_ParseFile(char *filename);
 
+/// Only call this on the FennecValues you get from the Parse* functions. Never call it on their children.
 void FennecConfig_FennecType_Free(FennecConfig_FennecValue *fen);
 
 #ifdef __cplusplus

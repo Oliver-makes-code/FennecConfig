@@ -1,4 +1,8 @@
-use std::{ffi::{c_char, CStr, CString}, ptr, fs};
+use std::{
+    ffi::{c_char, CStr},
+    fs::{self},
+    ptr,
+};
 
 use self::types::CFennecType;
 
@@ -39,38 +43,25 @@ unsafe extern "C" fn FennecConfig_FennecType_Free(fen: *const CFennecType) {
     if fen.is_null() {
         return;
     }
-    let fen = opaque_pointer::own_back(fen as *mut CFennecType).unwrap();
-
-    match fen {
-        CFennecType::Object(len, keys, values) => {
-            let mut i = 0;
-            while i < len {
-                let _ = CString::from_raw(*keys.add(i) as *mut i8);
-                println!("{:?} {:?}", &i as *const usize, values);
-                FennecConfig_FennecType_Free(values.add(i));
-                i += 1;
-            }
-        }
-        CFennecType::Array(len, values) => {
-            for i in 0..len {
-                FennecConfig_FennecType_Free(values.add(i));
-            }
-        }
-        CFennecType::String(str) => {
-            let _ = CString::from_raw(str as *mut i8);
-        }
-        _ => {}
-    }
+    let _ = opaque_pointer::own_back(fen as *mut CFennecType);
 }
 
 #[cfg(test)]
 mod test {
-    use super::{FennecConfig_ParseString, FennecConfig_FennecType_Free};
+    use std::ffi::CString;
+
+    use super::{FennecConfig_FennecType_Free, FennecConfig_ParseString};
 
     #[test]
     fn test_create_and_free() {
         unsafe {
-            let fen = FennecConfig_ParseString("test = \"owo\" owo = 15 uwu = false".as_ptr() as *const i8);
+            let fen = FennecConfig_ParseString(
+                CString::new("test = \"owo\"\nowo = 15\nuwu = false")
+                    .unwrap()
+                    .into_raw(),
+            );
+
+            assert!(!fen.is_null());
 
             FennecConfig_FennecType_Free(fen);
         }

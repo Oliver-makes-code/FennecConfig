@@ -60,7 +60,10 @@ impl From<&Result<FennecType, ParseError>> for CFennecType {
     fn from(value: &Result<FennecType, ParseError>) -> Self {
         match value {
             Ok(fen) => fen.into(),
-            _ => Self::Error,
+            Err(e) => {
+                println!("{e:?}");
+                Self::Error
+            }
         }
     }
 }
@@ -88,5 +91,28 @@ impl From<&FennecType> for CFennecType {
 impl From<FennecType> for CFennecType {
     fn from(value: FennecType) -> Self {
         (&value).into()
+    }
+}
+
+impl Drop for CFennecType {
+    fn drop(&mut self) {
+        unsafe {
+            match self {
+                Self::Object(len, keys, values) => {
+                    let keys = Vec::from_raw_parts(*keys as *mut *const i8, *len, *len);
+                    for key in keys {
+                        let _ = CString::from_raw(key as *mut i8);
+                    }
+                    let _ = Vec::from_raw_parts(*values as *mut CFennecType, *len, *len);
+                }
+                Self::Array(len, values) => {
+                    let _ = Vec::from_raw_parts(*values as *mut CFennecType, *len, *len);
+                }
+                Self::String(str) => {
+                    let _ = CString::from_raw(*str as *mut i8);
+                }
+                _ => {}
+            }
+        }
     }
 }
