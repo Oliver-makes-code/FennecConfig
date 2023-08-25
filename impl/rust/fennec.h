@@ -7,6 +7,7 @@ extern "C" {
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <string.h>
 
 typedef enum FennecConfig_FennecValue_Type {
     FennecConfig_FennecValue_Type_Object,
@@ -69,6 +70,25 @@ FennecConfig_FennecValue_Object *FennecConfig_FennecValue_GetObject(FennecConfig
     return &fen->value.object;
 }
 
+bool FennecConfig_FennecValue_Object_HasKey(FennecConfig_FennecValue_Object *obj, char *key) {
+    for (int i = 0; i < obj->len; i++) {
+        if (strcmp(key, obj->keys[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+
+FennecConfig_FennecValue *FennecConfig_FennecValue_Object_GetKey(FennecConfig_FennecValue_Object *obj, char *key) {
+    for (int i = 0; i < obj->len; i++) {
+        if (strcmp(key, obj->keys[i])) {
+            return &obj->values[i];
+        }
+    }
+
+    return (FennecConfig_FennecValue *)0;
+}
+
 bool FennecConfig_FennecValue_IsArray(FennecConfig_FennecValue *fen) {
     return fen->type == FennecConfig_FennecValue_Type_Array;
 }
@@ -81,13 +101,25 @@ FennecConfig_FennecValue_Array *FennecConfig_FennecValue_GetArray(FennecConfig_F
     return &fen->value.array;
 }
 
+size_t FennecConfig_FennecValue_Array_Len(FennecConfig_FennecValue_Array *arr) {
+    return arr->len;
+}
+
+FennecConfig_FennecValue *FennecConfig_FennecValue_Array_GetIdx(FennecConfig_FennecValue_Array *arr, size_t idx) {
+    if (idx >= arr->len) {
+        return (FennecConfig_FennecValue *)0;
+    }
+    
+    return &arr->arr[idx];
+}
+
 bool FennecConfig_FennecValue_IsString(FennecConfig_FennecValue *fen) {
     return fen->type == FennecConfig_FennecValue_Type_String;
 }
 
 char *FennecConfig_FennecValue_GetString(FennecConfig_FennecValue *fen) {
     if (!FennecConfig_FennecValue_IsString(fen)) {
-        return NULL;
+        return (char *)0;
     }
 
     return fen->value.string;
@@ -122,15 +154,27 @@ bool FennecConfig_FennecValue_IsNumber(FennecConfig_FennecValue *fen) {
 }
 
 double FennecConfig_FennecValue_GetNumber(FennecConfig_FennecValue *fen) {
-    if (!FennecConfig_FennecValue_IsNumber(fen)) {
-        return 0;
-    }
-
     if (FennecConfig_FennecValue_IsInt(fen)) {
         return (double)fen->value.i;
     }
 
-    return fen->value.f;
+    if (FennecConfig_FennecValue_IsFloat(fen)) {
+        return fen->value.f;
+    }
+    
+    return 0;
+}
+
+bool FennecConfig_FennecValue_IsBool(FennecConfig_FennecValue *fen) {
+    return fen->type == FennecConfig_FennecValue_Type_Bool;
+}
+
+bool FennecConfig_FennecValue_GetBool(FennecConfig_FennecValue *fen) {
+    if (!FennecConfig_FennecValue_IsBool(fen)) {
+        return false;
+    }
+    
+    return fen->value.b;
 }
 
 bool FennecConfig_FennecValue_IsNull(FennecConfig_FennecValue *fen) {
