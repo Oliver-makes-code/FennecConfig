@@ -259,7 +259,7 @@ impl Tokenizer {
         }
 
         if let Some(capture) = FLAG.captures(&str) {
-            let str = &capture[0];
+            let str = &capture[1];
             self.index += str.len() + 1;
             return Token::Flag(str.to_string(), Position(start_idx, self.index));
         }

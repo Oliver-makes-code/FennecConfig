@@ -55,7 +55,91 @@ FennecConfig_FennecValue *FennecConfig_ParseString(char *str);
 FennecConfig_FennecValue *FennecConfig_ParseFile(char *filename);
 
 /// Only call this on the FennecValues you get from the Parse* functions. Never call it on their children.
-void FennecConfig_FennecType_Free(FennecConfig_FennecValue *fen);
+void FennecConfig_FennecValue_Free(FennecConfig_FennecValue *fen);
+
+bool FennecConfig_FennecValue_IsObject(FennecConfig_FennecValue *fen) {
+    return fen->type == FennecConfig_FennecValue_Type_Object;
+}
+
+FennecConfig_FennecValue_Object *FennecConfig_FennecValue_GetObject(FennecConfig_FennecValue *fen) {
+    if (!FennecConfig_FennecValue_IsObject(fen)) {
+        return (FennecConfig_FennecValue_Object *)0;
+    }
+
+    return &fen->value.object;
+}
+
+bool FennecConfig_FennecValue_IsArray(FennecConfig_FennecValue *fen) {
+    return fen->type == FennecConfig_FennecValue_Type_Array;
+}
+
+FennecConfig_FennecValue_Array *FennecConfig_FennecValue_GetArray(FennecConfig_FennecValue *fen) {
+    if (!FennecConfig_FennecValue_IsArray(fen)) {
+        return (FennecConfig_FennecValue_Array *)0;
+    }
+
+    return &fen->value.array;
+}
+
+bool FennecConfig_FennecValue_IsString(FennecConfig_FennecValue *fen) {
+    return fen->type == FennecConfig_FennecValue_Type_String;
+}
+
+char *FennecConfig_FennecValue_GetString(FennecConfig_FennecValue *fen) {
+    if (!FennecConfig_FennecValue_IsString(fen)) {
+        return NULL;
+    }
+
+    return fen->value.string;
+}
+
+bool FennecConfig_FennecValue_IsFloat(FennecConfig_FennecValue *fen) {
+    return fen->type == FennecConfig_FennecValue_Type_Float;
+}
+
+double FennecConfig_FennecValue_GetFloat(FennecConfig_FennecValue *fen) {
+    if (!FennecConfig_FennecValue_IsFloat(fen)) {
+        return 0;
+    }
+
+    return fen->value.f;
+}
+
+bool FennecConfig_FennecValue_IsInt(FennecConfig_FennecValue *fen) {
+    return fen->type == FennecConfig_FennecValue_Type_Int;
+}
+
+long FennecConfig_FennecValue_GetInt(FennecConfig_FennecValue *fen) {
+    if (!FennecConfig_FennecValue_IsInt(fen)) {
+        return 0;
+    }
+
+    return fen->value.i;
+}
+
+bool FennecConfig_FennecValue_IsNumber(FennecConfig_FennecValue *fen) {
+    return fen->type == FennecConfig_FennecValue_Type_Float || fen->type == FennecConfig_FennecValue_Type_Int;
+}
+
+double FennecConfig_FennecValue_GetNumber(FennecConfig_FennecValue *fen) {
+    if (!FennecConfig_FennecValue_IsNumber(fen)) {
+        return 0;
+    }
+
+    if (FennecConfig_FennecValue_IsInt(fen)) {
+        return (double)fen->value.i;
+    }
+
+    return fen->value.f;
+}
+
+bool FennecConfig_FennecValue_IsNull(FennecConfig_FennecValue *fen) {
+    return fen->type == FennecConfig_FennecValue_Type_Null;
+}
+
+bool FennecConfig_FennecValue_IsError(FennecConfig_FennecValue *fen) {
+    return fen->type == FennecConfig_FennecValue_Type_Error;
+}
 
 #ifdef __cplusplus
 }

@@ -39,7 +39,7 @@ unsafe extern "C" fn FennecConfig_ParseFile(filename: *const c_char) -> *const C
 }
 
 #[no_mangle]
-unsafe extern "C" fn FennecConfig_FennecType_Free(fen: *const CFennecType) {
+unsafe extern "C" fn FennecConfig_FennecValue_Free(fen: *const CFennecType) {
     if fen.is_null() {
         return;
     }
@@ -52,7 +52,7 @@ mod test {
 
     use crate::extern_c::types::CFennecType;
 
-    use super::{FennecConfig_FennecType_Free, FennecConfig_ParseString, FennecConfig_ParseFile};
+    use super::{FennecConfig_FennecValue_Free, FennecConfig_ParseString, FennecConfig_ParseFile};
 
     #[test]
     fn parse_file() {
@@ -67,7 +67,7 @@ mod test {
 
             assert!(if let CFennecType::Object(_, _, _, _, _) = *fen { true } else { false });
 
-            FennecConfig_FennecType_Free(fen);
+            FennecConfig_FennecValue_Free(fen);
         }
     }
 
@@ -84,7 +84,7 @@ mod test {
 
             assert!(if let CFennecType::Object(_, _, _, _, _) = *fen { true } else { false });
 
-            FennecConfig_FennecType_Free(fen);
+            FennecConfig_FennecValue_Free(fen);
         }
     }
 
@@ -101,7 +101,7 @@ mod test {
 
             assert!(if let CFennecType::Object(_, _, _, _, _) = *fen_1 { true } else { false });
 
-            FennecConfig_FennecType_Free(fen_1);
+            FennecConfig_FennecValue_Free(fen_1);
 
             let fen_2 = FennecConfig_ParseString(
                 CString::new("owo = 15 uwu = \"nya\" nya [false null]")
