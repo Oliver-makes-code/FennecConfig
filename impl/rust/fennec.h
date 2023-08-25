@@ -37,6 +37,7 @@ typedef struct FennecConfig_FennecValue_Array {
     struct FennecConfig_FennecValue *arr;
 } FennecConfig_FennecValue_Array;
 
+/// It isn't recommended to operate on this by iteself. Rather, you should copy the data to your own representation and then free it with FennecConfig_FennecType_Free.
 typedef struct FennecConfig_FennecValue {
     FennecConfig_FennecValue_Type type;
     union {
