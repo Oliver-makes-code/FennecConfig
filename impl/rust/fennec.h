@@ -21,14 +21,19 @@ typedef enum FennecConfig_FennecValue_Type {
 
 struct FennecConfig_FennecValue;
 
+/// Ignore the capacity values, these are kept track of to properly free memory without leaking.
 typedef struct FennecConfig_FennecValue_Object {
     size_t len;
+    size_t keys_capacity;
     char **keys;
+    size_t values_capacity;
     struct FennecConfig_FennecValue *values;
 } FennecConfig_FennecValue_Object;
 
+/// Ignore the capacity values, these are kept track of to properly free memory without leaking.
 typedef struct FennecConfig_FennecValue_Array {
     size_t len;
+    size_t capacity;
     struct FennecConfig_FennecValue *arr;
 } FennecConfig_FennecValue_Array;
 

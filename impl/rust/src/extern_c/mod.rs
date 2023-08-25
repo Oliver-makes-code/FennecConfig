@@ -65,7 +65,7 @@ mod test {
 
             assert!(!fen.is_null());
 
-            assert!(if let CFennecType::Object(_, _, _) = *fen { true } else { false });
+            assert!(if let CFennecType::Object(_, _, _, _, _) = *fen { true } else { false });
 
             FennecConfig_FennecType_Free(fen);
         }
@@ -82,9 +82,38 @@ mod test {
 
             assert!(!fen.is_null());
 
-            assert!(if let CFennecType::Object(_, _, _) = *fen { true } else { false });
+            assert!(if let CFennecType::Object(_, _, _, _, _) = *fen { true } else { false });
 
             FennecConfig_FennecType_Free(fen);
+        }
+    }
+
+    #[test]
+    fn parse_free_parse() {
+        unsafe {
+            let fen_1 = FennecConfig_ParseString(
+                CString::new("owo = 15 uwu = \"nya\" nya [false null]")
+                    .unwrap()
+                    .into_raw(),
+            );
+
+            assert!(!fen_1.is_null());
+
+            assert!(if let CFennecType::Object(_, _, _, _, _) = *fen_1 { true } else { false });
+
+            FennecConfig_FennecType_Free(fen_1);
+
+            let fen_2 = FennecConfig_ParseString(
+                CString::new("owo = 15 uwu = \"nya\" nya [false null]")
+                    .unwrap()
+                    .into_raw(),
+            );
+
+            assert!(!fen_2.is_null());
+
+            assert!(if let CFennecType::Object(_, _, _, _, _) = *fen_2 { true } else { false });
+
+            println!("{fen_1:?} {fen_2:?}");
         }
     }
 }

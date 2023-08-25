@@ -8,8 +8,8 @@ use crate::parse::{FennecType, ParseError};
 #[repr(C)]
 #[derive(Debug)]
 pub enum CFennecType {
-    Object(usize, *const *const c_char, *const CFennecType),
-    Array(usize, *const CFennecType),
+    Object(usize, usize, *const *const c_char, usize, *const CFennecType),
+    Array(usize, usize, *const CFennecType),
     String(*const c_char),
     Float(f64),
     Int(i64),
@@ -24,29 +24,29 @@ impl CFennecType {
     }
 
     fn from_object(obj: &HashMap<String, FennecType>) -> Self {
-        let (keys, _, _) = obj
+        let (keys, _, c1) = obj
             .keys()
             .map(Self::transform_str)
             .collect::<Vec<_>>()
             .into_raw_parts();
 
-        let (values, len, _) = obj
+        let (values, len, c2) = obj
             .values()
             .map(Self::from)
             .collect::<Vec<_>>()
             .into_raw_parts();
 
-        Self::Object(len, keys, values)
+        Self::Object(len, c1, keys, c2, values)
     }
 
     fn from_array(arr: &Vec<FennecType>) -> Self {
-        let (ptr, len, _) = arr
+        let (ptr, len, c) = arr
             .iter()
             .map(Self::from)
             .collect::<Vec<_>>()
             .into_raw_parts();
 
-        Self::Array(len, ptr)
+        Self::Array(len, c, ptr)
     }
 
     fn from_string(str: &String) -> Self {
@@ -98,15 +98,15 @@ impl Drop for CFennecType {
     fn drop(&mut self) {
         unsafe {
             match self {
-                Self::Object(len, keys, values) => {
-                    let keys = Vec::from_raw_parts(*keys as *mut *const i8, *len, *len);
+                Self::Object(len, c1, keys, c2, values) => {
+                    let keys = Vec::from_raw_parts(*keys as *mut *const i8, *len, *c1);
                     for key in keys {
                         let _ = CString::from_raw(key as *mut i8);
                     }
-                    let _ = Vec::from_raw_parts(*values as *mut CFennecType, *len, *len);
+                    let _ = Vec::from_raw_parts(*values as *mut CFennecType, *len, *c2);
                 }
-                Self::Array(len, values) => {
-                    let _ = Vec::from_raw_parts(*values as *mut CFennecType, *len, *len);
+                Self::Array(len, c, values) => {
+                    let _ = Vec::from_raw_parts(*values as *mut CFennecType, *len, *c);
                 }
                 Self::String(str) => {
                     let _ = CString::from_raw(*str as *mut i8);
