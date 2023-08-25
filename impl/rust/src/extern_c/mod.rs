@@ -50,18 +50,39 @@ unsafe extern "C" fn FennecConfig_FennecType_Free(fen: *const CFennecType) {
 mod test {
     use std::ffi::CString;
 
-    use super::{FennecConfig_FennecType_Free, FennecConfig_ParseString};
+    use crate::extern_c::types::CFennecType;
+
+    use super::{FennecConfig_FennecType_Free, FennecConfig_ParseString, FennecConfig_ParseFile};
 
     #[test]
-    fn test_create_and_free() {
+    fn parse_file() {
         unsafe {
-            let fen = FennecConfig_ParseString(
-                CString::new("test = \"owo\"\nowo = 15\nuwu = false")
+            let fen = FennecConfig_ParseFile(
+                CString::new("../../specification.fennec")
                     .unwrap()
                     .into_raw(),
             );
 
             assert!(!fen.is_null());
+
+            assert!(if let CFennecType::Object(_, _, _) = *fen { true } else { false });
+
+            FennecConfig_FennecType_Free(fen);
+        }
+    }
+
+    #[test]
+    fn parse_string() {
+        unsafe {
+            let fen = FennecConfig_ParseString(
+                CString::new("owo = 15 uwu = \"nya\" nya [false null]")
+                    .unwrap()
+                    .into_raw(),
+            );
+
+            assert!(!fen.is_null());
+
+            assert!(if let CFennecType::Object(_, _, _) = *fen { true } else { false });
 
             FennecConfig_FennecType_Free(fen);
         }
