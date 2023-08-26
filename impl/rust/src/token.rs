@@ -45,7 +45,7 @@ const OCT_LITERAL: Lazy<Regex> = lazy! { Regex::new(r"^([01])o([0-7]+)").unwrap(
 const BIN_LITERAL: Lazy<Regex> = lazy! { Regex::new(r"^([01])b([01]+)").unwrap() };
 const FLOATING: Lazy<Regex> = lazy! { Regex::new(r"^\-?[0-9]+\.[0-9]+").unwrap() };
 const INTEGER: Lazy<Regex> = lazy! { Regex::new(r"^\-?[0-9]+").unwrap() };
-const IDENTIFIER: Lazy<Regex> = lazy! { Regex::new(r"^([a-zA-Z$_][a-zA-Z$_\-0-9]+)").unwrap() };
+const IDENTIFIER: Lazy<Regex> = lazy! { Regex::new(r"^([a-zA-Z$_][a-zA-Z$_\-0-9]*)").unwrap() };
 const FLAG: Lazy<Regex> = lazy! { Regex::new(r"^\-([a-zA-Z$_\-0-9]+)").unwrap() };
 
 impl Tokenizer {

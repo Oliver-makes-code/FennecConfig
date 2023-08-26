@@ -13,3 +13,20 @@ pub macro lazy($t:expr) {
 pub fn parse(str: &str) -> Result<FennecType, ParseError> {
     Parser::new(token::Tokenizer::new(str)).parse_root()
 }
+
+#[cfg(test)]
+mod test {
+    use crate::parse;
+    use crate::parse::ParseError;
+
+    #[test]
+    fn test_spec_file() -> Result<(), ParseError> {
+        const INPUT: &str = include_str!("../../../specification.fennec");
+
+        let res = parse(INPUT)?;
+
+        println!("{:#?}", res);
+
+        Ok(())
+    }
+}
