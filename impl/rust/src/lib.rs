@@ -29,4 +29,12 @@ mod test {
 
         Ok(())
     }
+
+    #[test]
+    fn test_trailing_whitespace() -> Result<(), ParseError> {
+        const INPUT: &str = "owo=\"uwu\"    ";
+        let _ = parse(INPUT)?;
+
+        Ok(())
+    }
 }

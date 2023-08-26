@@ -143,6 +143,11 @@ impl Tokenizer {
 
         while char.is_whitespace() {
             self.index += 1;
+
+            if self.is_end() {
+                return Token::Eof;
+            }
+            
             char = self.get_char();
         }
 
