@@ -304,6 +304,7 @@ function parseObject(text: string, token: Token, tokens: Generator<Token, void, 
         }
         if (token.type == TokenType.flag) {
             out[token.value as string] = true
+            last = tokens.next()
             continue
         }
         if (token.type != TokenType.identifier && token.type != TokenType.string) throw new common.ParserError("Unexpected "+token.type+" found when required identifer", text, token.start)
